@@ -1,0 +1,87 @@
+
+from collections import deque
+class Tree:
+    def __init__(self, val):
+        self.data=val
+        self.left=None
+        self.right=None
+        
+
+class solver:
+    
+    def __init__(self):
+        self.parent = {}
+        self.targetNode = None
+    #
+    def haspfunc(self, node):
+        if node==None:
+            return
+        if node.left!=None:
+            self.parent.update({node.left:node})
+        if node.right!=None:
+            self.parent.update({node.right:node})
+        self.haspfunc(node.left)
+        self.haspfunc(node.right)
+        
+    def findTarget(self, target, root):
+        if root==None:
+            return
+        
+        self.findTarget(target, root.left)
+        if root.data==target:
+            self.targetNode = root
+            
+        self.findTarget(target, root.right)
+        
+    def bfs(self, root, k):
+        queue = deque()
+        queue.append(root)
+        seen = {}
+        seen.update({root:1})
+        currentLevel = 0
+        while(len(queue)>0):
+            
+            if currentLevel==k:
+                return queue
+            layerSize = len(queue)
+            currentLevel+=1
+            for i in range(layerSize):
+                
+                node = queue.popleft()
+                if node.left!=None and node.left not in seen:
+                    queue.append(node.left)
+                    seen.update({node.left:1})
+                if node.right!=None and node.right not in seen:
+                    queue.append(node.right)
+                    seen.update({node.right:1})
+                if node in self.parent and self.parent[node] not in seen:
+                    queue.append(self.parent[node])
+                    seen.update({self.parent[node]:1})
+    
+    def KDistanceNodes(self,root,target,k):
+        # code here
+        # return the sorted list all nodes at k distance from target
+        node = root
+        self.haspfunc(node)
+        node = root
+        self.findTarget(target, node)
+        queue = self.bfs(self.targetNode, k)
+        list = []
+        for nodes in queue:
+            list.append(nodes.data)
+        list.sort()
+        return list 
+
+root=Tree(20)
+root.left=Tree(8)
+root.right=Tree(22)
+root.left.left=Tree(4)
+root.left.right=Tree(12)
+root.left.right.left=Tree(10)
+root.left.right.right=Tree(14)
+target=8
+k=2
+obj=solver()
+res=obj.KDistanceNodes(root, target, k)
+for i in res:
+    print(i, end=' ')
